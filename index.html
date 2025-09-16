@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MaonaObra — Assistente & Profissionais</title>
+  <meta name="description" content="Demo estático com assistente IA simulada, chat bonito, sugestões de profissionais e FAQ. Pronto para GitHub Pages." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1: #071226; --bg-2:#0b1220; --card:#071628; --muted:#9fb0c8; --text:#e6f0fb;
+      --accent:#7c3aed; --accent-2:#06b6d4; --glass:rgba(255,255,255,0.04); --glass-2:rgba(255,255,255,0.03);
+      --radius:16px; --max:1150px; --glass-border:1px solid rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent), linear-gradient(180deg,var(--bg-1), #05101a);color:var(--text);-webkit-font-smoothing:antialiased;padding:28px;display:flex;align-items:flex-start;justify-content:center}
+
+    .wrap{width:100%;max-width:var(--max)}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .logo{width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:800;color:white;font-size:22px;box-shadow:0 10px 30px rgba(92,49,255,0.14)}
+    h1{font-family:'Roboto Slab',serif;font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted)}
+
+    .top-actions{display:flex;gap:10px;align-items:center}
+    .btn{background:transparent;padding:10px 14px;border-radius:12px;color:var(--muted);border:var(--glass-border);cursor:pointer;font-weight:600}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:none;box-shadow:0 10px 30px rgba(6,182,212,0.06)}
+
+    main{display:grid;grid-template-columns:1fr 420px;gap:22px}
+    @media (max-width:1040px){main{grid-template-columns:1fr} .chat-panel{order:-1}}
+
+    /* Left */
+    .hero{padding:22px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:var(--glass-border);box-shadow:0 18px 50px rgba(2,6,23,0.6)}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+    .card{padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent);border:var(--glass-border)}
+    .card h3{margin:0 0 8px}
+    .muted{color:var(--muted)}
+
+    .prof-list{display:grid;gap:12px;margin-top:14px}
+    .prof{display:flex;align-items:center;gap:14px;padding:12px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02);transition:transform .18s ease, box-shadow .18s ease}
+    .prof:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(2,6,23,0.6)}
+    .avatar{width:62px;height:62px;border-radius:12px;background:linear-gradient(135deg,#0f1724,#0b1220);display:grid;place-items:center;color:#fff;font-weight:800}
+    .tags{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted)}
+
+    /* Chat panel */
+    .chat-panel{height:760px;padding:18px;border-radius:18px;border:var(--glass-border);background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;flex-direction:column}
+    .chat-header{display:flex;align-items:center;justify-content:space-between}
+    .chat-title{display:flex;gap:12px;align-items:center}
+    .assistant-avatar{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:grid;place-items:center;font-weight:800}
+    .meta small{color:var(--muted)}
+
+    .messages{flex:1;overflow:auto;padding:18px;border-radius:12px;margin-top:14px;background:linear-gradient(180deg, rgba(6,11,20,0.3), transparent);border:1px solid rgba(255,255,255,0.02)}
+    .msg-row{display:flex;margin-bottom:14px}
+    .msg{max-width:78%;padding:12px;border-radius:12px;line-height:1.45;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02)}
+    .msg.user{margin-left:auto;background:linear-gradient(90deg, rgba(124,58,237,0.14), rgba(6,182,212,0.06));color:white;border:none;box-shadow:0 8px 30px rgba(124,58,237,0.06)}
+    .msg.ai{margin-right:auto}
+    .msg .time{display:block;font-size:11px;color:var(--muted);margin-top:6px}
+
+    .typing{display:inline-block;height:8px;width:44px;border-radius:8px;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));position:relative}
+
+    .chat-input{display:flex;gap:10px;padding-top:12px}
+    .input-wrap{flex:1;display:flex;gap:8px;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .input-wrap input{flex:1;padding:12px;border:0;background:transparent;color:inherit;font-size:15px}
+    .actions{display:flex;gap:8px}
+
+    .suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{background:linear-gradient(90deg, rgba(255,255,255,0.015), transparent);padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;font-weight:600}
+
+    .faq{margin-top:16px}
+    .accordion{border-radius:12px;overflow:hidden}
+    .acc-item{border-bottom:1px solid var(--glass-2)}
+    .acc-btn{width:100%;text-align:left;padding:12px;background:transparent;border:none;color:inherit;display:flex;justify-content:space-between;align-items:center}
+    .acc-panel{padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);color:var(--muted)}
+
+    footer{margin-top:16px;color:var(--muted);font-size:13px}
+
+    /* professional card modal-ish inside chat bubble */
+    .prof-card{margin-top:10px;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,0.02)}
+    .prof-card .info{flex:1}
+    .prof-card .cta{display:flex;flex-direction:column;gap:8px}
+
+    /* small responsive */
+    @media (max-width:720px){ .grid{grid-template-columns:1fr} .hero{padding:14px} .chat-panel{height:640px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <h1>Mão na Obra</h1>
+          <p class="lead">Assistente inteligente — encontre profissionais confiáveis</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="themeToggle">Tema</button>
+        <button class="btn">Docs</button>
+        <button class="btn primary" id="focusChat">Abrir Assistente</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 style="margin:0;font-size:28px;font-weight:700">Converse com nossa assistente — rápida, prática e bonita</h2>
+            <p class="muted" style="margin-top:8px;max-width:68%">Chat simulado com linguagem natural, sugestões de profissionais integradas e FAQ dinâmico. Ideal para protótipos e GitHub Pages.</p>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--muted)">Última atualização: <strong>16/09/2025</strong></div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Profissionais em destaque</h3>
+            <p class="muted">Perfis curados com avaliações e skills. Clique em "Solicitar" diretamente no chat.</p>
+            <div class="prof-list" id="profList">
+              <!-- preenchido por JS -->
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Solicite um orçamento</h3>
+            <p class="muted">Formulário simples (simulado) — perfeito para testar fluxos.</p>
+            <form id="leadForm" style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+              <input name="name" placeholder="Seu nome" required style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+              <input name="contact" placeholder="Telefone ou e-mail" required style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+              <select name="service" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+                <option value="">Escolha um serviço</option>
+                <option>Eletricista</option>
+                <option>Encanador</option>
+                <option>Pedreiro</option>
+                <option>Pintor</option>
+                <option>Arquiteto</option>
+              </select>
+              <button class="btn primary" type="submit">Enviar pedido (simulado)</button>
+            </form>
+            <div id="leadStatus" class="muted" style="margin-top:10px;font-size:13px"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px" class="card">
+          <h3>Galeria & Destaques</h3>
+          <p class="muted">Exemplos estáticos para inspirar o cliente.</p>
+          <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px">Projeto: Cozinha moderna<br><small class="muted">Reforma completa</small></div>
+            <div style="flex:1;min-width:220px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px">Projeto: Sala integrada<br><small class="muted">Redistribuição de ambientes</small></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="chat-panel" aria-label="Assistente IA">
+        <div class="chat-header">
+          <div class="chat-title">
+            <div class="assistant-avatar">IA</div>
+            <div class="meta">
+              <div style="font-weight:700">Assistente Maona</div>
+              <small class="muted">Chat simulado • respostas locais</small>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="resetChat">Limpar</button>
+            <button class="btn" id="toggleFAQ">FAQ</button>
+          </div>
+        </div>
+
+        <div class="messages" id="messages" role="log" aria-live="polite">
+          <!-- mensagens dinamicas -->
+        </div>
+
+        <div class="suggestions" id="quickSuggestions">
+          <div class="chip" data-q="Preciso de um eletricista para trocar fiação">Eletricista</div>
+          <div class="chip" data-q="Tenho vazamento na cozinha, preciso de encanador">Encanador</div>
+          <div class="chip" data-q="Quero reformar minha sala, preciso de pedreiro">Pedreiro</div>
+          <div class="chip" data-q="Desejo pintar e acabamento">Pintor</div>
+          <div class="chip" data-q="Preciso de projeto e layout, arquiteto">Arquiteto</div>
+        </div>
+
+        <div class="chat-input">
+          <div class="input-wrap">
+            <input id="chatText" placeholder="Digite sua dúvida... ex: 'Como trocar um disjuntor?'" aria-label="mensagem" />
+            <div class="actions">
+              <button class="btn" id="voiceBtn">🎙️</button>
+              <button class="btn" id="attachBtn">📎</button>
+            </div>
+          </div>
+          <div>
+            <button class="btn primary" id="sendBtn">Enviar</button>
+          </div>
+        </div>
+
+        <div class="faq" id="faqSection" hidden>
+          <h3>FAQ</h3>
+          <div class="accordion" id="faqList"></div>
+        </div>
+
+        <footer>
+          <small class="muted">Versão demo • Histórico local salvo no navegador</small>
+        </footer>
+      </aside>
+    </main>
+
+    <footer style="text-align:center;margin-top:18px">
+      <small class="muted">Feito com carinho — pronto para GitHub Pages</small>
+    </footer>
+  </div>
+
+  <script>
+    // ===== Dados simulados =====
+    const professionals = [
+      {name:'Carlos Silva', job:'Eletricista', city:'São Paulo', rating:4.9, skills:['Instalação','Painel','Reparo'], phone:'(11) 90000-0001'},
+      {name:'Mariana Costa', job:'Encanador', city:'Rio de Janeiro', rating:4.8, skills:['Vazamentos','Esgoto'], phone:'(21) 90000-0002'},
+      {name:'João Pereira', job:'Pedreiro', city:'Belo Horizonte', rating:4.7, skills:['Alvenaria','Reforma'], phone:'(31) 90000-0003'},
+      {name:'Ana Rodrigues', job:'Pintor', city:'Curitiba', rating:4.6, skills:['Acabamento','Textura'], phone:'(41) 90000-0004'},
+      {name:'Luiz Almeida', job:'Arquiteto', city:'Porto Alegre', rating:4.95, skills:['Planta','Projeto'], phone:'(51) 90000-0005'},
+    ];
+
+    const faqs = [
+      {q:'Como contratar um profissional?', a:'Preencha o formulário de orçamento e use o botão "Solicitar" no chat para simular contato imediato.'},
+      {q:'Os profissionais são verificados?', a:'Neste protótipo os perfis são simulados. Em produção, integraríamos avaliação, documentos e reviews.'},
+      {q:'Tem custo usar o assistente?', a:'Não — é uma simulação local. Implementações reais podem incluir planos ou taxas administrativas.'},
+      {q:'Como os orçamentos são calculados?', a:'Peça uma estimativa pelo chat com detalhes do serviço (m², materiais, urgência) para uma estimativa simulada.'},
+    ];
+
+    // ===== UI — preencher lista de profissionais =====
+    const profList = document.getElementById('profList');
+    professionals.forEach((p,idx)=>{
+      const el = document.createElement('div'); el.className='prof';
+      el.innerHTML = `
+        <div class="avatar">${p.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:700">${p.name}</div>
+              <small class="muted">${p.job} • ${p.city}</small>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:800">${p.rating}</div>
+              <small class="muted">Avaliação</small>
+            </div>
+          </div>
+          <div class="tags">${p.skills.map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+        </div>
+      `;
+      // click to suggest in chat
+      el.addEventListener('click',()=>{ appendMessage('ai', buildProfCard(p)); messagesEl.scrollTop = messagesEl.scrollHeight; saveChatHistory(); });
+      profList.appendChild(el);
+    });
+
+    // ===== FAQ =====
+    const faqList = document.getElementById('faqList');
+    faqs.forEach((f,i)=>{
+      const it = document.createElement('div'); it.className='acc-item';
+      it.innerHTML = `
+        <button class="acc-btn" data-idx="${i}">${f.q} <span>+</span></button>
+        <div class="acc-panel" hidden>${f.a}</div>
+      `;
+      faqList.appendChild(it);
+    });
+    faqList.addEventListener('click',e=>{
+      const btn = e.target.closest('.acc-btn'); if(!btn) return; const panel = btn.nextElementSibling; const open = !panel.hidden;
+      faqList.querySelectorAll('.acc-panel').forEach(p=>p.hidden=true); faqList.querySelectorAll('.acc-btn span').forEach(s=>s.textContent='+');
+      if(!open){ panel.hidden=false; btn.querySelector('span').textContent='−'; }
+    });
+
+    // ===== Chat core =====
+    const messagesEl = document.getElementById('messages');
+    const chatInput = document.getElementById('chatText');
+    const sendBtn = document.getElementById('sendBtn');
+    const quick = document.getElementById('quickSuggestions');
+    const resetChat = document.getElementById('resetChat');
+    const toggleFAQ = document.getElementById('toggleFAQ');
+    const focusChat = document.getElementById('focusChat');
+
+    const canned = [
+      {k:['eletricista','disjuntor','fiação','tomada'], r:'Para troca de disjuntor ou fiação, é recomendado contratar um eletricista qualificado. Posso mostrar eletricistas com avaliação alta.'} ,
+      {k:['vazamento','encanador','torneira','cano'], r:'Vazamentos podem causar danos sérios — feche o registro e chame um encanador. Deseja contatos agora?'} ,
+      {k:['reforma','pedreiro','alvenaria','reboco'], r:'Reformas exigem planejamento. Posso estimar custo aproximado se você informar metros quadrados e tipo de acabamento.'} ,
+      {k:['pintor','pintura','acabamento','textura'], r:'Pintores cuidam do preparo e acabamento. Quer ver pintores com avaliações e amostras de trabalho?'} ,
+      {k:['arquiteto','projeto','planta','layout'], r:'Um arquiteto pode preparar planta e layout. Posso sugerir arquitetos com portfólio relevante.'} ,
+    ];
+
+    function timeNow(){ const d=new Date(); return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+
+    function appendMessage(who,content){
+      const row = document.createElement('div'); row.className='msg-row';
+      const bubble = document.createElement('div'); bubble.className='msg '+(who==='user'?'user':'ai');
+      if(typeof content === 'string') bubble.innerHTML = `<div>${content}</div><span class='time'>${timeNow()}</span>`;
+      else bubble.appendChild(content);
+      row.appendChild(bubble);
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function buildProfCard(p){
+      const container = document.createElement('div'); container.className='prof-card';
+      container.innerHTML = `
+        <div style="width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:800">${p.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>
+        <div class='info'>
+          <div style='font-weight:700'>${p.name} <small class='muted'>• ${p.job}</small></div>
+          <div class='muted' style='font-size:13px;margin-top:4px'>${p.city} • Avaliação ${p.rating}</div>
+        </div>
+        <div class='cta'>
+          <button class='btn' onclick="copyPhone('${p.phone.replace(/'/g,'')}','${p.name.replace(/'/g,'')}')">Solicitar</button>
+          <button class='btn primary' onclick="appendMessage('ai','Perfil salvo nos favoritos (simulado).')">Favoritar</button>
+        </div>
+      `;
+      return container;
+    }
+
+    window.copyPhone = function(phone,name){ appendMessage('user', `Quero contatar: ${name} — ${phone}`); appendMessage('ai', 'Pedido enviado (simulado).'); saveChatHistory(); }
+
+    function simulateAI(userText){
+      // typing placeholder
+      const tRow = document.createElement('div'); tRow.className='msg-row';
+      const t = document.createElement('div'); t.className='msg ai'; t.innerHTML = `<div class='typing'></div><span class='time'>${timeNow()}</span>`; tRow.appendChild(t); messagesEl.appendChild(tRow); messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      // compute response
+      let resp = null;
+      const ut = userText.toLowerCase();
+      for(const c of canned){ if(c.k.some(kw=>ut.includes(kw))){ resp=c.r; break; } }
+      if(!resp){
+        // heuristics: if ask for orçamento
+        if(ut.match(/orçamento|estimativa|quanto|preço|custo/)) resp = 'Para estimativa, me diga: (1) tipo de serviço, (2) m² ou quantidade, (3) materiais desejados e (4) cidade. Posso simular uma estimativa.';
+        else resp = 'Posso ajudar com isso! Descreva brevemente o problema ou escolha uma sugestão abaixo (Eletricista/Encanador/Pedreiro...).';
+      }
+
+      setTimeout(()=>{
+        tRow.remove(); appendMessage('ai', resp);
+
+        // if response suggests professionals, show top 3 cards
+        if(resp.toLowerCase().includes('eletricista') || ut.includes('eletricista')) showProfessionalSuggestions(['Eletricista']);
+        else if(resp.toLowerCase().includes('encanador') || ut.includes('encanador')) showProfessionalSuggestions(['Encanador']);
+        else if(resp.toLowerCase().includes('pedreiro') || ut.includes('pedreiro')) showProfessionalSuggestions(['Pedreiro']);
+        else if(resp.toLowerCase().includes('pintor') || ut.includes('pintor')) showProfessionalSuggestions(['Pintor']);
+        else if(resp.toLowerCase().includes('arquiteto') || ut.includes('arquiteto')) showProfessionalSuggestions(['Arquiteto']);
+        else if(resp.toLowerCase().includes('estimativa')) appendMessage('ai','Se quiser, envie os detalhes para eu gerar uma estimativa simulada.');
+
+        saveChatHistory();
+      }, 700 + Math.random()*900);
+    }
+
+    function showProfessionalSuggestions(roles){
+      let list = [];
+      if(Array.isArray(roles)){ roles.forEach(r=>{ professionals.forEach(p=>{ if(p.job.toLowerCase()===r.toLowerCase()) list.push(p); }) }); }
+      if(list.length===0) list = professionals.slice(0,3);
+      // append a bubble with cards
+      const wrapper = document.createElement('div');
+      list.forEach(p=>{ wrapper.appendChild(buildProfCard(p)); });
+      appendMessage('ai', wrapper);
+    }
+
+    function sendChat(){ const v = chatInput.value.trim(); if(!v) return; appendMessage('user', v); chatInput.value=''; simulateAI(v); }
+
+    sendBtn.addEventListener('click', sendChat);
+    chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+
+    quick.addEventListener('click', e=>{ const chip = e.target.closest('.chip'); if(!chip) return; chatInput.value = chip.dataset.q; sendChat(); });
+    resetChat.addEventListener('click', ()=>{ messagesEl.innerHTML=''; localStorage.removeItem('maona_chat'); appendMessage('ai','Olá! Eu sou a Assistente Maona — como posso ajudar você hoje?'); });
+    toggleFAQ.addEventListener('click', ()=>{ const f=document.getElementById('faqSection'); f.hidden=!f.hidden; if(!f.hidden) f.scrollIntoView({behavior:'smooth'}); });
+    focusChat.addEventListener('click', ()=>{ chatInput.focus(); messagesEl.scrollTop = messagesEl.scrollHeight; });
+
+    // lead form
+    document.getElementById('leadForm').addEventListener('submit', function(e){ e.preventDefault(); document.getElementById('leadStatus').textContent='Pedido enviado (simulado).'; this.querySelector('button').disabled=true; });
+
+    // local history
+    function saveChatHistory(){ const msgs = Array.from(messagesEl.querySelectorAll('.msg')).map(m=>({who:m.classList.contains('user')?'user':'ai', html:m.innerHTML})); localStorage.setItem('maona_chat', JSON.stringify(msgs)); }
+    function restoreChat(){ const s = localStorage.getItem('maona_chat'); if(s){ try{ const msgs = JSON.parse(s); msgs.forEach(m=>{ const row=document.createElement('div'); row.className='msg-row'; const b=document.createElement('div'); b.className='msg '+(m.who==='user'?'user':'ai'); b.innerHTML=m.html; row.appendChild(b); messagesEl.appendChild(row); }); messagesEl.scrollTop = messagesEl.scrollHeight; }catch(e){ console.warn(e); } }
+      if(!messagesEl.children.length) appendMessage('ai','Olá! Eu sou a Assistente Maona — como posso ajudar você hoje?'); }
+    restoreChat();
+
+    // persist on mutations
+    const obs = new MutationObserver(()=> saveChatHistory()); obs.observe(messagesEl,{childList:true,subtree:true});
+
+    // simple theme toggle (simulate)
+    document.getElementById('themeToggle').addEventListener('click', ()=>{ document.body.classList.toggle('light'); alert('Alternância de tema (apenas conceito nesta demo).'); });
+
+    // keyboard quick focus
+    window.addEventListener('keydown', e=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA'){ e.preventDefault(); chatInput.focus(); } });
+  </script>
+</body>
+</html>
